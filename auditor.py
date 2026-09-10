@@ -7,6 +7,7 @@ while quantity != "quit":
     else: 
     #Accidentally added int alr so this will be the third commit
         inventory += int(quantity)
+        print("Current Inventory: " + str(inventory))
     
     quantity = input("Enter Stock Quantity or type 'quit' to exit: ")
 
