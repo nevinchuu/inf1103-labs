@@ -1,4 +1,5 @@
-inventory, quantity, failed_attempts
+inventory, quantity, failed_attempts, current_total = 0
+new_value = 10
 
 def get_valid_input():
     user_input = input("Enter a stock quantity or type 'quit' to exit: ")
