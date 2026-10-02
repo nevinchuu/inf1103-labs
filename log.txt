@@ -1,0 +1,77 @@
+commit 2ef23c44ac8393819c585e035764e0c1fe2f5dea
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Fri Sep 25 11:16:03 2026 +0800
+
+    Week 4 Persistent Inventory
+
+commit 6b6dd9f89788cb32e76a7db6d63c6c3882d0c195
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Fri Sep 18 10:47:27 2026 +0800
+
+    Added last function Generate report
+
+commit 21b8284fd5ba217e13f55f529a5c5b8a1bab9412
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Fri Sep 18 10:20:06 2026 +0800
+
+    Added Third Function
+
+commit aee035e8a386e48fd59b90343f39521cf86ff346
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Fri Sep 18 10:16:33 2026 +0800
+
+    Added Second Function
+
+commit 2c3ea33d9fd5a7586195e5ef9e70ff38a38d3eea
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Fri Sep 18 10:07:17 2026 +0800
+
+    Added modular auditor
+
+commit 1cb1daee9f4f4dcf5463df82a13f3f85f27ba4fb
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:46:39 2026 +0800
+
+    Part Eight - Reporting
+
+commit 3efedf1cbb21a5d53d372737ed595a99a00fd1a9
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:45:38 2026 +0800
+
+    Part Seven - Trigger Overstock Alert
+
+commit 960d5d7798dfa5d04564264cdaf11d2b8b8b9259
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:43:38 2026 +0800
+
+    Six Part, Manage State of Inventory
+
+commit 709dba7e830b258b24b9d1bfc64247b543535762
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:42:04 2026 +0800
+
+    Fifth part, Enforced Business rules
+
+commit f02f98396ebe47d991c319e3ef5733117cfd5ade
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:39:56 2026 +0800
+
+    Forth Part
+
+commit 8a856f153193d530cb0e7996ee5a522772779da7
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:37:29 2026 +0800
+
+    Third Part
+
+commit e05a4e3a398147b28fe52eab672922a9b61ab439
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:34:59 2026 +0800
+
+    Second Part
+
+commit 2c937b6b1bf6b387149bc09d092e724751970a29
+Author: nevinchua <2603219@sit.singaporetech.edu.sg>
+Date:   Thu Sep 10 17:29:41 2026 +0800
+
+    Initial commit
