@@ -1,50 +1,51 @@
 import json
 import os
 
+from inventory import Inventory
+from product import Product
+
 # Path can be overridden (used by Docker so the file lives in a mounted volume)
 FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
 
 
-# ---------------------------------------------------------------- persistence
+# ---------------------------------------------------------------- file handling
 def load_inventory():
-    """Load inventory from inventory.json if it exists, else return an empty list."""
+    """Load inventory.json into an Inventory of Product objects."""
+    inventory = Inventory()
     if os.path.exists(FILENAME):
         print(f"{os.path.basename(FILENAME)} found.")
         try:
-            with open(FILENAME, "r") as f:
-                inventory = json.load(f)
+            with open(FILENAME, "r") as file:
+                for item in json.load(file):
+                    inventory.add_product(
+                        Product(item["id"], item["name"], item["price"], item["stock"]))
             print("Inventory loaded successfully.")
-            return inventory
-        except (json.JSONDecodeError, OSError):
+        except (json.JSONDecodeError, OSError, KeyError, TypeError):
             print("Could not read file. Starting with an empty inventory.")
-            return []
-    print(f"{os.path.basename(FILENAME)} not found. Starting with an empty inventory.")
-    return []
+            return Inventory()
+    else:
+        print(f"{os.path.basename(FILENAME)} not found. Starting with an empty inventory.")
+    return inventory
 
 
 def save_inventory(inventory):
-    """Save the inventory list to inventory.json."""
-    with open(FILENAME, "w") as f:
-        json.dump(inventory, f, indent=4)
+    """Save the Product objects in the inventory to inventory.json."""
+    data = [{"id": product.get_product_id(), "name": product.get_name(),
+             "price": product.get_price(), "stock": product.get_stock()}
+            for product in inventory.get_products()]
+    with open(FILENAME, "w") as file:
+        json.dump(data, file, indent=4)
     print(f"Inventory saved successfully to {os.path.basename(FILENAME)}.")
 
 
-# Data Manipulation
-def find_product(inventory, product_id):
-    """Return the product dictionary with the given ID, or None."""
-    for product in inventory:
-        if product["id"].lower() == product_id.lower():
-            return product
-    return None
-
-
+# ------------------------------------------------------------------ user input
 def add_product(inventory):
     print("Add New Product")
     product_id = input("Product ID: ").strip().upper()
     if not product_id:
         print("Product ID cannot be empty.")
         return
-    if find_product(inventory, product_id):
+    if inventory.search_product(product_id):
         print("A product with that ID already exists.")
         return
 
@@ -62,56 +63,42 @@ def add_product(inventory):
         print("Invalid input. Price and stock must be non-negative numbers.")
         return
 
-    inventory.append({"id": product_id, "name": name, "price": price, "stock": stock})
+    inventory.add_product(Product(product_id, name, price, stock))
     print("Product added successfully!")
 
 
 def update_stock(inventory):
     print("Update Stock")
-    product = find_product(inventory, input("Enter Product ID: ").strip())
+    product = inventory.search_product(input("Enter Product ID: ").strip())
     if product is None:
         print("Product not found.")
         return
 
     print("Product Found:")
-    print(f"Name: {product['name']}")
-    print(f"Current Stock: {product['stock']}")
+    print(f"Name: {product.get_name()}")
+    print(f"Current Stock: {product.get_stock()}")
     try:
         new_stock = int(input("New Stock Quantity: ").strip())
-        if new_stock < 0:
-            raise ValueError
     except ValueError:
         print("Invalid input. Stock must be a non-negative whole number.")
         return
 
-    product["stock"] = new_stock
-    print("Stock updated successfully!")
+    if product.update_stock(new_stock):
+        print("Stock updated successfully!")
+    else:
+        print("Invalid input. Stock must be a non-negative whole number.")
 
 
 def search_product(inventory):
     print("Search Product")
-    product = find_product(inventory, input("Enter Product ID: ").strip())
+    product = inventory.search_product(input("Enter Product ID: ").strip())
     if product is None:
         print("Product not found.")
         return
 
     print("Product Found")
     print("-" * 48)
-    print(f"ID: {product['id']}")
-    print(f"Name: {product['name']}")
-    print(f"Price: ${product['price']:.2f}")
-    print(f"Stock: {product['stock']}")
-    print("-" * 48)
-
-
-def display_all(inventory):
-    print("Current Inventory")
-    print("-" * 48)
-    if not inventory:
-        print("No products in inventory.")
-    for p in inventory:
-        print(f"ID: {p['id']} | Name: {p['name']} | "
-              f"Price: ${p['price']:.2f} | Stock: {p['stock']}")
+    product.display_information()
     print("-" * 48)
 
 
@@ -139,7 +126,7 @@ def main():
         choice = input("Enter option: ").strip()
 
         if choice == "1":
-            display_all(inventory)
+            inventory.display_all()
         elif choice == "2":
             add_product(inventory)
         elif choice == "3":
