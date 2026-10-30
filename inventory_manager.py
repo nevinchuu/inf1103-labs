@@ -2,7 +2,7 @@ import json
 import os
 
 from inventory import Inventory
-from product import Product
+from product_factory import PRODUCT_TYPES, product_class_for
 
 # Path can be overridden (used by Docker so the file lives in a mounted volume)
 FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
@@ -10,29 +10,38 @@ FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
 
 # ---------------------------------------------------------------- file handling
 def load_inventory():
-    """Load inventory.json into an Inventory of Product objects."""
+    """Load inventory.json into an Inventory of Product subclass objects.
+
+    Returns (inventory, loaded_ok). loaded_ok is False if the file exists but
+    could not be read, so the caller knows not to save over it.
+    """
     inventory = Inventory()
     if os.path.exists(FILENAME):
         print(f"{os.path.basename(FILENAME)} found.")
         try:
             with open(FILENAME, "r") as file:
                 for item in json.load(file):
-                    inventory.add_product(
-                        Product(item["id"], item["name"], item["price"], item["stock"]))
+                    product_class = product_class_for(item["type"])
+                    if product_class is None:
+                        raise KeyError(item["type"])
+                    inventory.add_product(product_class.from_dict(item))
             print("Inventory loaded successfully.")
         except (json.JSONDecodeError, OSError, KeyError, TypeError):
             print("Could not read file. Starting with an empty inventory.")
-            return Inventory()
+            print("Saving is disabled so the existing file is not overwritten.")
+            return Inventory(), False
     else:
         print(f"{os.path.basename(FILENAME)} not found. Starting with an empty inventory.")
-    return inventory
+    return inventory, True
 
 
-def save_inventory(inventory):
+def save_inventory(inventory, can_save=True):
     """Save the Product objects in the inventory to inventory.json."""
-    data = [{"id": product.get_product_id(), "name": product.get_name(),
-             "price": product.get_price(), "stock": product.get_stock()}
-            for product in inventory.get_products()]
+    if not can_save:
+        print(f"Not saved: {os.path.basename(FILENAME)} could not be loaded, "
+              "so it was left untouched. Fix or remove the file and restart.")
+        return
+    data = [product.to_dict() for product in inventory.get_products()]
     with open(FILENAME, "w") as file:
         json.dump(data, file, indent=4)
     print(f"Inventory saved successfully to {os.path.basename(FILENAME)}.")
@@ -49,6 +58,12 @@ def add_product(inventory):
         print("A product with that ID already exists.")
         return
 
+    print("Product types: " + ", ".join(PRODUCT_TYPES))
+    product_class = product_class_for(input("Product type: ").strip().lower())
+    if product_class is None:
+        print("Invalid product type.")
+        return
+
     name = input("Product Name: ").strip()
     if not name:
         print("Product name cannot be empty.")
@@ -59,11 +74,19 @@ def add_product(inventory):
         stock = int(input("Stock Quantity: ").strip())
         if price < 0 or stock < 0:
             raise ValueError
+        extras = []
+        for _, prompt, convert in product_class.EXTRA_FIELDS:
+            value = convert(input(f"{prompt}: ").strip())
+            if convert is not str and value < 0:
+                raise ValueError
+            if convert is str and not value:
+                raise ValueError
+            extras.append(value)
     except ValueError:
-        print("Invalid input. Price and stock must be non-negative numbers.")
+        print("Invalid input. Numbers must be non-negative and text cannot be empty.")
         return
 
-    inventory.add_product(Product(product_id, name, price, stock))
+    inventory.add_product(product_class(product_id, name, price, stock, *extras))
     print("Product added successfully!")
 
 
@@ -119,7 +142,7 @@ def main():
     print("INVENTORY MANAGEMENT SYSTEM")
     print("=" * 40)
 
-    inventory = load_inventory()
+    inventory, can_save = load_inventory()
     show_menu()
 
     while True:
@@ -135,10 +158,10 @@ def main():
             search_product(inventory)
         elif choice == "5":
             print("Saving inventory...")
-            save_inventory(inventory)
+            save_inventory(inventory, can_save)
         elif choice == "6":
             print("Saving inventory before exit...")
-            save_inventory(inventory)
+            save_inventory(inventory, can_save)
             print("Thank you for using Inventory Management System.")
             print("Program terminated.")
             break

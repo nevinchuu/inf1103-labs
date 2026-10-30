@@ -1,20 +1,66 @@
 [
     {
-        "id": "P001", 
+        "type": "physical",
+        "id": "P001",
         "name": "Laptop",
-        "price": 1200.0, 
-        "stock": 15
+        "price": 1200.0,
+        "stock": 200,
+        "weight": 2.0
     },
     {
-        "id": "P002", 
-        "name": "Mouse", 
-        "price": 25.5, 
-        "stock": 40
+        "type": "physical",
+        "id": "P002",
+        "name": "Mouse",
+        "price": 25.5,
+        "stock": 40,
+        "weight": 0.1
     },
     {
-        "id": "P003", 
-        "name": "Keyboard", 
-        "price": 45.0, 
-        "stock": 25
+        "type": "physical",
+        "id": "P003",
+        "name": "Keyboard",
+        "price": 45.0,
+        "stock": 25,
+        "weight": 0.8
+    },
+    {
+        "type": "physical",
+        "id": "P004",
+        "name": "Light",
+        "price": 200.0,
+        "stock": 50,
+        "weight": 1.5
+    },
+    {
+        "type": "digital",
+        "id": "D001",
+        "name": "Operating System",
+        "price": 199.0,
+        "stock": 500,
+        "download_size": 4096.0
+    },
+    {
+        "type": "digital",
+        "id": "D002",
+        "name": "Photo Editor",
+        "price": 59.9,
+        "stock": 300,
+        "download_size": 350.0
+    },
+    {
+        "type": "subscription",
+        "id": "S001",
+        "name": "Cloud Storage",
+        "price": 9.99,
+        "stock": 1000,
+        "billing_period": "monthly"
+    },
+    {
+        "type": "physical",
+        "id": "1234",
+        "name": "Hello",
+        "price": 100.0,
+        "stock": 200,
+        "weight": 5.0
     }
 ]

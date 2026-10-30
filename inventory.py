@@ -29,4 +29,5 @@ class Inventory:
             print("No products in inventory.")
         for product in self.__products:
             product.display_information()
+            print("\n")
         print("-" * 48)
