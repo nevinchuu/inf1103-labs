@@ -9,7 +9,7 @@ FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
 
 
 # ---------------------------------------------------------------- file handling
-def load_inventory():
+def load_inventory() -> tuple[Inventory, bool]:
     """Load inventory.json into an Inventory of Product subclass objects.
 
     Returns (inventory, loaded_ok). loaded_ok is False if the file exists but
@@ -35,7 +35,7 @@ def load_inventory():
     return inventory, True
 
 
-def save_inventory(inventory, can_save=True):
+def save_inventory(inventory: Inventory, can_save: bool = True) -> None:
     """Save the Product objects in the inventory to inventory.json."""
     if not can_save:
         print(f"Not saved: {os.path.basename(FILENAME)} could not be loaded, "
@@ -48,7 +48,7 @@ def save_inventory(inventory, can_save=True):
 
 
 # ------------------------------------------------------------------ user input
-def add_product(inventory):
+def add_product(inventory: Inventory) -> None:
     print("Add New Product")
     product_id = input("Product ID: ").strip().upper()
     if not product_id:
@@ -90,7 +90,7 @@ def add_product(inventory):
     print("Product added successfully!")
 
 
-def update_stock(inventory):
+def update_stock(inventory: Inventory) -> None:
     print("Update Stock")
     product = inventory.find_product(input("Enter Product ID: ").strip())
     if product is None:
@@ -112,7 +112,7 @@ def update_stock(inventory):
         print("Invalid input. Stock must be a non-negative whole number.")
 
 
-def search_product(inventory):
+def search_product(inventory: Inventory) -> None:
     print("Search Product")
     product = inventory.find_product(input("Enter Product ID: ").strip())
     if product is None:
@@ -126,7 +126,7 @@ def search_product(inventory):
 
 
 # ----------------------------------------------------------------------- menu
-def show_menu():
+def show_menu() -> None:
     print("----------- MENU -----------")
     print("1. Display All Products")
     print("2. Add Product")
@@ -137,7 +137,7 @@ def show_menu():
     print("----------------------------")
 
 
-def main():
+def main() -> None:
     print("=" * 40)
     print("INVENTORY MANAGEMENT SYSTEM")
     print("=" * 40)

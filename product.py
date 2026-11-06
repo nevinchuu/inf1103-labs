@@ -21,43 +21,43 @@ class Product(ABC):
         self.__supplier: Supplier = supplier
 
     # Read-only access to the private attributes
-    def get_product_id(self):
+    def get_product_id(self) -> str:
         return self.__product_id
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.__name
 
-    def get_price(self):
+    def get_price(self) -> float:
         return self.__price
 
-    def get_stock(self):
+    def get_stock(self) -> int:
         return self.__stock
 
     def get_supplier(self) -> Supplier:
         return self.__supplier
 
-    def update_stock(self, quantity):
+    def update_stock(self, quantity: int) -> bool:
         """Set the stock level. Returns True if accepted, False if invalid."""
         if not isinstance(quantity, int) or quantity < 0:
             return False
         self.__stock = quantity
         return True
 
-    def display_information(self):
+    def display_information(self) -> None:
         print(f"ID: {self.__product_id} | Name: {self.__name} | "
               f"Price: ${self.__price:.2f} | Stock: {self.__stock}")
     @abstractmethod
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         """Return a message describing how this product is fulfilled."""
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """Common fields for saving; subclasses add their own."""
         return {"type": self.TYPE, "id": self.__product_id, "name": self.__name,
                 "price": self.__price, "stock": self.__stock,
                 "supplier": self.__supplier.to_dict()}
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict) -> "Product":
         """Build a product from saved data, reading this type's extra fields."""
         extras = [data[key] for key, _, _ in cls.EXTRA_FIELDS]
         supplier = Supplier.from_dict(data["supplier"])

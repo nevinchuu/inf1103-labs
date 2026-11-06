@@ -13,17 +13,17 @@ class SubscriptionProduct(Product):
         super().__init__(product_id, name, price, stock, supplier)
         self.__billing_period = billing_period
 
-    def get_billing_period(self):
+    def get_billing_period(self) -> str:
         return self.__billing_period
 
-    def display_information(self):
+    def display_information(self) -> None:
         super().display_information()
         print(f"    Billed: {self.__billing_period}")
 
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         return "Subscription product: activated online and billed periodically."
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         data = super().to_dict()
         data["billing_period"] = self.__billing_period
         return data
