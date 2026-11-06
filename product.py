@@ -57,9 +57,15 @@ class Product(ABC):
                 "supplier": self.__supplier.to_dict()}
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Product":
-        """Build a product from saved data, reading this type's extra fields."""
+    def from_dict(cls, data: dict, suppliers: dict[str, Supplier] | None = None) -> "Product":
+        """Build a product from saved data, reading this type's extra fields.
+
+        `suppliers` maps supplier IDs to Supplier objects already created while
+        loading, so products from the same supplier share one Supplier object."""
         extras = [data[key] for key, _, _ in cls.EXTRA_FIELDS]
-        supplier = Supplier.from_dict(data["supplier"])
+        if suppliers is None:
+            suppliers = {}
+        supplier = suppliers.setdefault(data["supplier"]["id"],
+                                        Supplier.from_dict(data["supplier"]))
         return cls(data["id"], data["name"], data["price"], data["stock"],
                    supplier, *extras)

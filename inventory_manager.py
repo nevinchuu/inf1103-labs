@@ -3,6 +3,7 @@ import os
 
 from inventory import Inventory
 from product_factory import PRODUCT_TYPES, product_class_for
+from supplier import Supplier
 
 # Path can be overridden (used by Docker so the file lives in a mounted volume)
 FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
@@ -16,6 +17,7 @@ def load_inventory() -> tuple[Inventory, bool]:
     could not be read, so the caller knows not to save over it.
     """
     inventory = Inventory()
+    suppliers: dict[str, Supplier] = {}
     if os.path.exists(FILENAME):
         print(f"{os.path.basename(FILENAME)} found.")
         try:
@@ -24,7 +26,7 @@ def load_inventory() -> tuple[Inventory, bool]:
                     product_class = product_class_for(item["type"])
                     if product_class is None:
                         raise KeyError(item["type"])
-                    inventory.add_product(product_class.from_dict(item))
+                    inventory.add_product(product_class.from_dict(item, suppliers))
             print("Inventory loaded successfully.")
         except (json.JSONDecodeError, OSError, KeyError, TypeError):
             print("Could not read file. Starting with an empty inventory.")
@@ -48,6 +50,44 @@ def save_inventory(inventory: Inventory, can_save: bool = True) -> None:
 
 
 # ------------------------------------------------------------------ user input
+def choose_supplier(inventory: Inventory) -> Supplier | None:
+    """Pick one of the suppliers already in the inventory, or create a new one.
+
+    Returns None if the input is invalid.
+    """
+    # Products from the same supplier share one Supplier object, so reusing it keeps that true
+    known = {}
+    for product in inventory.get_products():
+        known.setdefault(product.get_supplier().get_supplier_id(), product.get_supplier())
+    suppliers = list(known.values())
+
+    if suppliers:
+        print("Suppliers:")
+        for number, supplier in enumerate(suppliers, start=1):
+            print(f"{number}. {supplier.get_name()} ({supplier.get_supplier_id()})")
+        print(f"{len(suppliers) + 1}. Add new supplier")
+        try:
+            choice = int(input("Select supplier: ").strip())
+        except ValueError:
+            choice = 0
+        if 1 <= choice <= len(suppliers):
+            return suppliers[choice - 1]
+        if choice != len(suppliers) + 1:
+            print("Invalid supplier choice.")
+            return None
+
+    supplier_id = input("Supplier ID: ").strip().upper()
+    supplier_name = input("Supplier Name: ").strip()
+    contact_email = input("Supplier Email: ").strip()
+    if not supplier_id or not supplier_name or not contact_email:
+        print("Supplier ID, name and email cannot be empty.")
+        return None
+    if supplier_id in known:
+        print("A supplier with that ID already exists.")
+        return None
+    return Supplier(supplier_id, supplier_name, contact_email)
+
+
 def add_product(inventory: Inventory) -> None:
     print("Add New Product")
     product_id = input("Product ID: ").strip().upper()
@@ -86,7 +126,11 @@ def add_product(inventory: Inventory) -> None:
         print("Invalid input. Numbers must be non-negative and text cannot be empty.")
         return
 
-    inventory.add_product(product_class(product_id, name, price, stock, *extras))
+    supplier = choose_supplier(inventory)
+    if supplier is None:
+        return
+
+    inventory.add_product(product_class(product_id, name, price, stock, supplier, *extras))
     print("Product added successfully!")
 
 
