@@ -12,6 +12,10 @@ class Order:
     def get_order_id(self) -> str:
         return self.__order_id
 
+    def get_order_lines(self) -> list[OrderLine]:
+        """Return a copy of the order lines (for inspection)."""
+        return list(self.__order_lines)
+
     def add_order_line(self, product: Product, quantity: int) -> None:
         """Composition: the Order creates the OrderLine itself."""
         self.__order_lines.append(OrderLine(product, quantity))
