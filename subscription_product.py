@@ -1,4 +1,5 @@
 from product import Product
+from supplier import Supplier
 
 
 class SubscriptionProduct(Product):
@@ -7,8 +8,9 @@ class SubscriptionProduct(Product):
     TYPE = "subscription"
     EXTRA_FIELDS = [("billing_period", "Billing period (e.g. monthly)", str)]
 
-    def __init__(self, product_id, name, price, stock, billing_period):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id: str, name: str, price: float, stock: int,
+                 supplier: Supplier, billing_period: str) -> None:
+        super().__init__(product_id, name, price, stock, supplier)
         self.__billing_period = billing_period
 
     def get_billing_period(self):

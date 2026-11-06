@@ -1,5 +1,6 @@
 from can_be_shipped import CanBeShipped
 from product import Product
+from supplier import Supplier
 
 BASE_SHIPPING = 5.00
 SHIPPING_PER_KG = 2.00
@@ -11,8 +12,9 @@ class PhysicalProduct(Product, CanBeShipped):
     TYPE = "physical"
     EXTRA_FIELDS = [("weight", "Weight (kg)", float)]
 
-    def __init__(self, product_id, name, price, stock, weight):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id: str, name: str, price: float, stock: int,
+                 supplier: Supplier, weight: float) -> None:
+        super().__init__(product_id, name, price, stock, supplier)
         self.__weight = weight
 
     def get_weight(self):
