@@ -1,6 +1,7 @@
-from discount_strategy import DiscountStrategy, NoDiscount
-from order_line import OrderLine
-from product import Product
+from src.discounts.discount_strategy import DiscountStrategy
+from src.discounts.no_discount import NoDiscount
+from src.models.order_line import OrderLine
+from src.models.product import Product
 
 
 class Order:

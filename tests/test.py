@@ -1,25 +1,27 @@
-"""Lab 7, Lab 8 and Lab 9 checks (run: python test.py)."""
+"""Lab 7, Lab 8 and Lab 9 checks (run from project folder: python -m tests.test)."""
 import inspect
 import os
 import tempfile
 from unittest.mock import patch
 
-from digital_product import DigitalProduct
-from physical_product import PhysicalProduct
-from product import Product
-from product_factory import product_class_for
-from subscription_product import SubscriptionProduct
-from discount_strategy import (BulkDiscount, DiscountStrategy,
-                               PercentageDiscount, StudentDiscount)
-from product_factory import ProductFactory
-from order_line import OrderLine
-from can_be_shipped import CanBeShipped
-from inventory import Inventory
-from order import Order
-from supplier import Supplier
+from src.models.digital_product import DigitalProduct
+from src.models.physical_product import PhysicalProduct
+from src.models.product import Product
+from src.models.product_factory import product_class_for
+from src.models.subscription_product import SubscriptionProduct
+from src.discounts.bulk_discount import BulkDiscount
+from src.discounts.discount_strategy import DiscountStrategy
+from src.discounts.percentage_discount import PercentageDiscount
+from src.discounts.student_discount import StudentDiscount
+from src.models.product_factory import ProductFactory
+from src.models.order_line import OrderLine
+from src.models.can_be_shipped import CanBeShipped
+from src.models.inventory import Inventory
+from src.models.order import Order
+from src.models.supplier import Supplier
 
 os.environ["INVENTORY_FILE"] = os.path.join(tempfile.mkdtemp(), "test.json")
-import inventory_manager as im 
+import src.main.inventory_manager as im 
 
 acme = Supplier("S1", "Acme", "sales@acme.com")
 laptop = PhysicalProduct("P1", "Laptop", 1200.0, 5, acme, 2.0)
@@ -169,7 +171,7 @@ with patch("builtins.input", side_effect=["abc", "-5", "12.50"]):
 
 print("-- loading products.csv")
 csv_inventory = Inventory()
-im.load_products("products.csv", csv_inventory, acme)
+im.load_products("data/products.csv", csv_inventory, acme)
 assert [p.get_product_id() for p in csv_inventory.get_products()] == ["P001", "D001", "P003"]
 im.load_products("missing.csv", csv_inventory, acme)
 assert len(csv_inventory.get_products()) == 3

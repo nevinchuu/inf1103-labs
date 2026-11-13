@@ -1,4 +1,4 @@
-from product import Product
+from src.models.product import Product
 
 
 class Inventory:

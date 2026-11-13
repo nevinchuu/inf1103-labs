@@ -1,6 +1,6 @@
-from can_be_shipped import CanBeShipped
-from product import Product
-from supplier import Supplier
+from src.models.can_be_shipped import CanBeShipped
+from src.models.product import Product
+from src.models.supplier import Supplier
 
 BASE_SHIPPING = 5.00
 SHIPPING_PER_KG = 2.00

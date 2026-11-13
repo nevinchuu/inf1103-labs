@@ -1,8 +1,8 @@
-from digital_product import DigitalProduct
-from physical_product import PhysicalProduct
-from product import Product
-from subscription_product import SubscriptionProduct
-from supplier import Supplier
+from src.models.digital_product import DigitalProduct
+from src.models.physical_product import PhysicalProduct
+from src.models.product import Product
+from src.models.subscription_product import SubscriptionProduct
+from src.models.supplier import Supplier
 
 # The only place a new product type needs to be registered.
 PRODUCT_TYPES = {cls.TYPE: cls

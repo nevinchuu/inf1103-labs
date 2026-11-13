@@ -1,5 +1,5 @@
-from product import Product
-from supplier import Supplier
+from src.models.product import Product
+from src.models.supplier import Supplier
 
 
 class DigitalProduct(Product):

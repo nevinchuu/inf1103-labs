@@ -2,12 +2,12 @@ import csv
 import json
 import os
 
-from inventory import Inventory
-from product_factory import PRODUCT_TYPES, ProductFactory, product_class_for
-from supplier import Supplier
+from src.models.inventory import Inventory
+from src.models.product_factory import PRODUCT_TYPES, ProductFactory, product_class_for
+from src.models.supplier import Supplier
 
 # Path can be overridden (used by Docker so the file lives in a mounted volume)
-FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
+FILENAME = os.environ.get("INVENTORY_FILE", "data/inventory.json")
 
 
 # file handling

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from supplier import Supplier
+from src.models.supplier import Supplier
 
 
 class Product(ABC):
