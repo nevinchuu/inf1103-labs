@@ -1,3 +1,4 @@
+from discount_strategy import DiscountStrategy, NoDiscount
 from order_line import OrderLine
 from product import Product
 
@@ -5,9 +6,14 @@ from product import Product
 class Order:
     """A customer order. It creates and manages its own OrderLine objects."""
 
-    def __init__(self, order_id: str) -> None:
+    def __init__(self, order_id: str, discount: DiscountStrategy | None = None) -> None:
         self.__order_id: str = order_id
         self.__order_lines: list[OrderLine] = []
+        # Association: the strategy is given to the Order and can be shared.
+        self.__discount: DiscountStrategy = discount if discount is not None else NoDiscount()
+
+    def set_discount(self, discount: DiscountStrategy) -> None:
+        self.__discount = discount
 
     def get_order_id(self) -> str:
         return self.__order_id
@@ -29,7 +35,8 @@ class Order:
         return False
 
     def calculate_total(self) -> float:
-        return sum(order_line.calculate_subtotal() for order_line in self.__order_lines)
+        total = sum(order_line.calculate_subtotal() for order_line in self.__order_lines)
+        return self.__discount.apply(total)
 
     def display_information(self) -> None:
         print(f"Order {self.__order_id}")
