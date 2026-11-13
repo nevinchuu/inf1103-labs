@@ -9,7 +9,7 @@ class SubscriptionProduct(Product):
     EXTRA_FIELDS = [("billing_period", "Billing period (e.g. monthly)", str)]
 
     def __init__(self, product_id: str, name: str, price: float, stock: int,
-                 supplier: Supplier, billing_period: str) -> None:
+                 supplier: Supplier, billing_period: str = "monthly") -> None:
         super().__init__(product_id, name, price, stock, supplier)
         self.__billing_period = billing_period
 

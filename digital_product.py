@@ -9,7 +9,7 @@ class DigitalProduct(Product):
     EXTRA_FIELDS = [("download_size", "Download size (MB)", float)]
 
     def __init__(self, product_id: str, name: str, price: float, stock: int,
-                 supplier: Supplier, download_size: float) -> None:
+                 supplier: Supplier, download_size: float = 0.0) -> None:
         super().__init__(product_id, name, price, stock, supplier)
         self.__download_size = download_size
 

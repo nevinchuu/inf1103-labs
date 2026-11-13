@@ -2,14 +2,14 @@ import json
 import os
 
 from inventory import Inventory
-from product_factory import PRODUCT_TYPES, product_class_for
+from product_factory import PRODUCT_TYPES, ProductFactory, product_class_for
 from supplier import Supplier
 
 # Path can be overridden (used by Docker so the file lives in a mounted volume)
 FILENAME = os.environ.get("INVENTORY_FILE", "inventory.json")
 
 
-# ---------------------------------------------------------------- file handling
+# file handling
 def load_inventory() -> tuple[Inventory, bool]:
     """Load inventory.json into an Inventory of Product subclass objects.
 
@@ -49,7 +49,7 @@ def save_inventory(inventory: Inventory, can_save: bool = True) -> None:
     print(f"Inventory saved successfully to {os.path.basename(FILENAME)}.")
 
 
-# ------------------------------------------------------------------ user input
+# user input
 def choose_supplier(inventory: Inventory) -> Supplier | None:
     """Pick one of the suppliers already in the inventory, or create a new one.
 
@@ -130,7 +130,8 @@ def add_product(inventory: Inventory) -> None:
     if supplier is None:
         return
 
-    inventory.add_product(product_class(product_id, name, price, stock, supplier, *extras))
+    inventory.add_product(ProductFactory.create(product_class.TYPE, product_id, name,
+                                                price, stock, supplier, *extras))
     print("Product added successfully!")
 
 
@@ -169,7 +170,7 @@ def search_product(inventory: Inventory) -> None:
     print("-" * 48)
 
 
-# ----------------------------------------------------------------------- menu
+# menu
 def show_menu() -> None:
     print("----------- MENU -----------")
     print("1. Display All Products")

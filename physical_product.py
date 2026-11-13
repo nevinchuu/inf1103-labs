@@ -13,7 +13,7 @@ class PhysicalProduct(Product, CanBeShipped):
     EXTRA_FIELDS = [("weight", "Weight (kg)", float)]
 
     def __init__(self, product_id: str, name: str, price: float, stock: int,
-                 supplier: Supplier, weight: float) -> None:
+                 supplier: Supplier, weight: float = 0.0) -> None:
         super().__init__(product_id, name, price, stock, supplier)
         self.__weight = weight
 
