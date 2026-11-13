@@ -1,19 +1,25 @@
-"""Lab 7 and Lab 8 checks (run: python test.py)."""
+"""Lab 7, Lab 8 and Lab 9 checks (run: python test.py)."""
+import inspect
 import os
 import tempfile
+from unittest.mock import patch
 
 from digital_product import DigitalProduct
 from physical_product import PhysicalProduct
 from product import Product
 from product_factory import product_class_for
 from subscription_product import SubscriptionProduct
+from discount_strategy import (BulkDiscount, DiscountStrategy,
+                               PercentageDiscount, StudentDiscount)
+from product_factory import ProductFactory
+from order_line import OrderLine
 from can_be_shipped import CanBeShipped
 from inventory import Inventory
 from order import Order
 from supplier import Supplier
 
 os.environ["INVENTORY_FILE"] = os.path.join(tempfile.mkdtemp(), "test.json")
-import inventory_manager as im  # noqa: E402  (after env var so FILENAME is the temp file)
+import inventory_manager as im 
 
 acme = Supplier("S1", "Acme", "sales@acme.com")
 laptop = PhysicalProduct("P1", "Laptop", 1200.0, 5, acme, 2.0)
@@ -65,7 +71,7 @@ assert not loaded_ok
 im.save_inventory(empty, loaded_ok)
 assert open(im.FILENAME).read() == before
 
-# ------------------------------------------------------------------ Lab 8
+# Lab 8
 print("-- association: Supplier and Product")
 supplier = Supplier("S9", "Globex", "info@globex.com")
 physical = PhysicalProduct("P9", "Monitor", 300.0, 3, supplier, 5.0)
@@ -119,5 +125,53 @@ expected = {"P9": "Physical product: requires physical shipping.",
 for product in mixed.get_products():
     show_product_details(product)
     assert product.get_fulfilment_info() == expected[product.get_product_id()]
+
+# Lab 9
+print("-- strategy: Order uses a DiscountStrategy")
+assert "if" not in inspect.getsource(Order.calculate_total)
+lamp = ProductFactory.create("physical", "L1", "Lamp", 125.0, 10, acme)
+order = Order("O9", BulkDiscount(200, 20))
+order.add_order_line(lamp, 2)
+assert order.calculate_total() == 230.0
+order.set_discount(PercentageDiscount(10))
+assert order.calculate_total() == 225.0
+order.set_discount(StudentDiscount())
+assert order.calculate_total() == 237.5
+default_order = Order("O10")
+default_order.add_order_line(lamp, 2)
+assert default_order.calculate_total() == 250.0
+assert isinstance(StudentDiscount(), DiscountStrategy)
+
+print("-- factory: products created through ProductFactory")
+for type_name, cls in (("physical", PhysicalProduct), ("digital", DigitalProduct),
+                       ("subscription", SubscriptionProduct)):
+    assert type(ProductFactory.create(type_name, "F1", "Item", 10.0, 1, acme)) is cls
+try:
+    ProductFactory.create("service", "S001", "Installation", 30.0, 5, acme)
+    assert False, "unknown type was accepted"
+except ValueError as error:
+    print("ValueError:", error)
+    assert str(error) == "Unknown product type: service"
+
+print("-- validation: invalid price, stock and quantity rejected")
+for make in (lambda: ProductFactory.create("physical", "V1", "X", 0, 1, acme),
+             lambda: ProductFactory.create("digital", "V2", "X", 5.0, -1, acme),
+             lambda: OrderLine(lamp, 0)):
+    try:
+        make()
+        assert False, "invalid value was accepted"
+    except ValueError as error:
+        print("ValueError:", error)
+
+print("-- user input: asks again until valid")
+with patch("builtins.input", side_effect=["abc", "-5", "12.50"]):
+    assert im.get_positive_float("Price: ") == 12.5
+
+print("-- loading products.csv")
+csv_inventory = Inventory()
+im.load_products("products.csv", csv_inventory, acme)
+assert [p.get_product_id() for p in csv_inventory.get_products()] == ["P001", "D001", "P003"]
+im.load_products("missing.csv", csv_inventory, acme)
+assert len(csv_inventory.get_products()) == 3
 
 print("ALL CHECKS PASSED")
