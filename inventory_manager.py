@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 
@@ -49,7 +50,47 @@ def save_inventory(inventory: Inventory, can_save: bool = True) -> None:
     print(f"Inventory saved successfully to {os.path.basename(FILENAME)}.")
 
 
+def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
+    """Load products from a CSV file through ProductFactory, skipping invalid rows."""
+    try:
+        file = open(path, newline="")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        with file:
+            reader = csv.reader(file)
+            next(reader, None)  # skip the header row
+            loaded = 0
+            for row in reader:
+                try:
+                    product_type, product_id, name, price, stock = row
+                    product = ProductFactory.create(product_type, product_id, name,
+                                                    float(price), int(stock), supplier)
+                except ValueError as error:
+                    print(f"Skipped row {row}: {error}")
+                    continue
+                if inventory.add_product(product):
+                    loaded += 1
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
+
+
 # user input
+def get_positive_float(prompt: str) -> float:
+    """Keep asking until the user enters a number greater than zero."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+
+
+
 def choose_supplier(inventory: Inventory) -> Supplier | None:
     """Pick one of the suppliers already in the inventory, or create a new one.
 
@@ -109,10 +150,10 @@ def add_product(inventory: Inventory) -> None:
         print("Product name cannot be empty.")
         return
 
+    price = get_positive_float("Price: ")
     try:
-        price = float(input("Price: ").strip())
         stock = int(input("Stock Quantity: ").strip())
-        if price <= 0 or stock < 0:
+        if stock < 0:
             raise ValueError
         extras = []
         for _, prompt, convert in product_class.EXTRA_FIELDS:
