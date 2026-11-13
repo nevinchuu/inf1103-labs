@@ -5,6 +5,8 @@ class OrderLine:
     """One product and quantity within an Order. Created and owned by that Order."""
 
     def __init__(self, product: Product, quantity: int) -> None:
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero.")
         # Association: the Product exists independently and is only referenced.
         self.__product: Product = product
         self.__quantity: int = quantity

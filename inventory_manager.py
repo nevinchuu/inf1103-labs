@@ -28,7 +28,7 @@ def load_inventory() -> tuple[Inventory, bool]:
                         raise KeyError(item["type"])
                     inventory.add_product(product_class.from_dict(item, suppliers))
             print("Inventory loaded successfully.")
-        except (json.JSONDecodeError, OSError, KeyError, TypeError):
+        except (json.JSONDecodeError, OSError, KeyError, TypeError, ValueError):
             print("Could not read file. Starting with an empty inventory.")
             print("Saving is disabled so the existing file is not overwritten.")
             return Inventory(), False
@@ -112,7 +112,7 @@ def add_product(inventory: Inventory) -> None:
     try:
         price = float(input("Price: ").strip())
         stock = int(input("Stock Quantity: ").strip())
-        if price < 0 or stock < 0:
+        if price <= 0 or stock < 0:
             raise ValueError
         extras = []
         for _, prompt, convert in product_class.EXTRA_FIELDS:
