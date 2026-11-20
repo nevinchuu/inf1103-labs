@@ -71,5 +71,7 @@ class Product(ABC):
             suppliers = {}
         supplier = suppliers.setdefault(data["supplier"]["id"],
                                         Supplier.from_dict(data["supplier"]))
-        return cls(data["id"], data["name"], data["price"], data["stock"],
-                   supplier, *extras)
+        # Imported here because product_factory imports the Product subclasses
+        from src.models.product_factory import ProductFactory
+        return ProductFactory.create(cls.TYPE, data["id"], data["name"], data["price"],
+                                     data["stock"], supplier, *extras)
